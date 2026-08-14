@@ -51,6 +51,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::cla
     // Bookings
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/', [AdminBookingController::class, 'index'])->name('index');
+        Route::get('/import', [AdminBookingController::class, 'importForm'])->name('import.form');
+        Route::post('/import', [AdminBookingController::class, 'import'])->name('import');
+        Route::get('/import/template', [AdminBookingController::class, 'downloadTemplate'])->name('import.template');
         Route::get('/{booking}', [AdminBookingController::class, 'show'])->name('show');
         Route::patch('/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('status');
         Route::patch('/{booking}/payment', [AdminBookingController::class, 'updatePayment'])->name('payment');

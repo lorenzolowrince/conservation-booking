@@ -24,6 +24,9 @@
         </div>
         <button type="submit" class="btn-primary py-2 px-4 text-sm">Filter</button>
         <a href="{{ route('admin.bookings.index') }}" class="btn-secondary py-2 px-4 text-sm">Clear</a>
+        <a href="{{ route('admin.bookings.import.form') }}" class="btn-secondary py-2 px-4 text-sm ml-auto">
+            Import from Excel
+        </a>
     </form>
 </div>
 
