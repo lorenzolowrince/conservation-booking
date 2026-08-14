@@ -10,11 +10,18 @@ RUN npm run build
 FROM php:8.3-cli-alpine
 
 RUN apk add --no-cache \
+        postgresql-libs \
+        libpng \
+        libzip \
+        oniguruma \
+    && apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
         postgresql-dev \
         libpng-dev \
         libzip-dev \
         oniguruma-dev \
     && docker-php-ext-install pdo pdo_pgsql pgsql mbstring bcmath zip gd \
+    && apk del .build-deps \
     && rm -rf /var/cache/apk/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
