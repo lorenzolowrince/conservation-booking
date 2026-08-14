@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Hosting Cost Proposal — Conservation Booking System</title>
+<style>
+  :root {
+    --paper: #f3f4ee;
+    --surface: #ffffff;
+    --surface-2: #eceee4;
+    --ink: #1c231d;
+    --muted: #5c6355;
+    --line: #d9dccf;
+    --pine: #2e5941;
+    --pine-soft: #e4ece6;
+    --gold: #8f6a1c;
+    --gold-soft: #f3e8cf;
+    --shadow: 0 1px 2px rgba(28,35,29,0.06), 0 8px 24px -12px rgba(28,35,29,0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet { max-width: 42rem; margin: 0 auto; padding: 3.25rem 1.5rem 4rem; }
+  h1, h2 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .num { font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace; font-variant-numeric: tabular-nums; }
+
+  .masthead { border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
+  .eyebrow { font-size: 0.72rem; letter-spacing: 0.11em; text-transform: uppercase; color: var(--pine); font-weight: 600; }
+  .masthead h1 { font-size: 1.85rem; margin-top: 0.3rem; }
+  .masthead .org { color: var(--muted); font-size: 0.95rem; margin-top: 0.4rem; }
+  .status {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--gold);
+    background: var(--gold-soft);
+    padding: 0.3rem 0.7rem;
+    border-radius: 5px;
+  }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; margin-top: 0.9rem; font-size: 0.82rem; color: var(--muted); }
+  .meta-row strong { color: var(--ink); font-weight: 600; }
+
+  section { margin-top: 2.4rem; }
+  section h2 { font-size: 1.2rem; margin-bottom: 0.75rem; }
+  section p { font-size: 0.95rem; color: var(--ink); margin: 0 0 0.8rem; max-width: 38rem; }
+  section p.muted { color: var(--muted); font-size: 0.88rem; }
+
+  .ask {
+    margin-top: 2.5rem;
+    padding: 1.9rem 2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .ask .label { font-size: 0.72rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .ask .figure { font-size: 2.6rem; font-weight: 700; color: var(--pine); margin-top: 0.4rem; }
+  .ask .figure .unit { font-size: 1rem; font-weight: 500; color: var(--muted); }
+  .ask .sub { margin-top: 0.5rem; font-size: 0.92rem; color: var(--muted); }
+  .ask .approx { margin-top: 0.9rem; font-size: 0.78rem; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 0.7rem; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 28rem; }
+  thead th { text-align: left; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); }
+  thead th.r, td.r { text-align: right; }
+  tbody td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--line); }
+  tbody tr:last-child td { border-bottom: none; }
+  tfoot td { padding: 0.85rem 1rem; font-weight: 700; border-top: 2px solid var(--line); }
+  td.free { color: var(--pine); font-weight: 600; }
+
+  .note-box {
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--surface-2);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .note-box strong { color: var(--ink); }
+
+  .signoff {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .signoff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; margin-top: 1.2rem; }
+  .sig-line { border-bottom: 1px solid var(--ink); height: 2.4rem; }
+  .sig-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+
+  footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: 0.75rem; color: var(--muted); }
+
+  @media print {
+    body { background: #fff; }
+    .sheet { padding: 0 0.5in; }
+    .ask, .table-wrap { box-shadow: none; }
+  }
+
+  @media (max-width: 30rem) {
+    .signoff-grid { grid-template-columns: 1fr; }
+    .ask .figure { font-size: 2.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="masthead">
+    <div class="eyebrow">Internal Proposal</div>
+    <h1>Hosting Cost Proposal</h1>
+    <div class="org">Conservation Booking System &mdash; Yayasan Sabah Conservation Division</div>
+    <div class="status">For management approval</div>
+    <div class="meta-row">
+      <span>Prepared <strong>14 Aug 2026</strong></span>
+      <span>Prepared by <strong>IT / Digital Team</strong></span>
+    </div>
+  </div>
+
+  <section>
+    <h2>What this is about</h2>
+    <p>The new online booking system for the 7 conservation areas (DVCA, MBCA, ICCA, SCCA, TRCA, INFAPRO, INIKEA) has been built and is already working online. It lets visitors browse conservation areas and book stays, and lets staff manage bookings from an admin dashboard.</p>
+    <p>Right now the system is running on a completely free trial setup while it's being tested. This proposal asks for approval to spend a small monthly amount so the website runs reliably for real visitors and staff, instead of staying on the free trial setup indefinitely.</p>
+  </section>
+
+  <section>
+    <h2>The one problem the free setup has</h2>
+    <p>To keep the website free, the hosting provider "puts the website to sleep" after 15 minutes with no visitors. The next person to open the site then has to wait up to about a minute for it to "wake up" before the page appears &mdash; similar to a computer waking from sleep mode.</p>
+    <p class="muted">This is fine for internal testing, but is not the experience we want for real visitors deciding whether to book a stay, or for staff who need the admin dashboard to open promptly during work hours.</p>
+  </section>
+
+  <div class="ask">
+    <div class="label">Amount requested for approval</div>
+    <div class="figure num">RM 29<span class="unit"> / month</span></div>
+    <div class="sub">≈ USD $7.00 per month &nbsp;&middot;&nbsp; ≈ RM 344 / USD $84.00 per year</div>
+    <div class="approx">Billing is in US Dollars (card payment); the Ringgit figure is an approximate conversion at today's exchange rate (~RM 4.09 = USD 1) and will vary slightly month to month with the exchange rate.</div>
+  </div>
+
+  <section>
+    <h2>What the money is for</h2>
+    <p>The RM 29/month upgrades the website's hosting plan to "always-on," which removes the sleep delay entirely. This is the only paid item in this proposal.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Item</th><th>What it does</th><th class="r">Monthly cost</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Website hosting</td>
+            <td>Keeps the booking website always running, with no wake-up delay for visitors or staff</td>
+            <td class="r num">RM 29 (USD $7.00)</td>
+          </tr>
+          <tr>
+            <td>Booking database</td>
+            <td>Stores all booking, visitor, and area records &mdash; stays on its free plan</td>
+            <td class="r free num">RM 0 (Free)</td>
+          </tr>
+          <tr>
+            <td>Website source code storage</td>
+            <td>Keeps a backup of the website's code so it can be updated and redeployed &mdash; stays on its free plan</td>
+            <td class="r free num">RM 0 (Free)</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="2">Total requested</td><td class="r num">RM 29 / month</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <div class="note-box">
+      <strong>Practical note:</strong> a credit or debit card will need to be placed on file with the hosting provider to activate this plan &mdash; none of the current accounts have a card on file today, since everything so far has run on free plans.
+    </div>
+  </section>
+
+  <section>
+    <h2>Looking further ahead</h2>
+    <p class="muted">The booking database is currently free and, at the traffic levels expected for this system, is likely to remain free for a long time. If visitor numbers grow substantially in future, the database may eventually need a small paid upgrade as well &mdash; estimated at roughly RM 8&ndash;50/month (USD $2&ndash;12) depending on actual usage at that time. This is <strong>not</strong> part of what's being requested now &mdash; it's flagged here only so it isn't a surprise later, and would come back as a separate request if and when it's actually needed.</p>
+  </section>
+
+  <div class="signoff">
+    <h2>Approval</h2>
+    <div class="signoff-grid">
+      <div>
+        <div class="sig-line"></div>
+        <div class="sig-label">Prepared by &mdash; Name &amp; Date</div>
+      </div>
+      <div>
+        <div class="sig-line"></div>
+        <div class="sig-label">Approved by &mdash; Name &amp; Date</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Prepared 14 Aug 2026. Pricing confirmed against the hosting providers' current published rates on the same date; the MYR conversion is approximate and for budgeting reference only.
+  </footer>
+
+</div>
+</body>
+</html>
