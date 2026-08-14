@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+    --color-forest-50: #f0fdf4;
+    --color-forest-100: #dcfce7;
+    --color-forest-200: #bbf7d0;
+    --color-forest-300: #86efac;
+    --color-forest-400: #4ade80;
+    --color-forest-500: #22c55e;
+    --color-forest-600: #16a34a;
+    --color-forest-700: #15803d;
+    --color-forest-800: #166534;
+    --color-forest-900: #14532d;
+    --color-forest-950: #052e16;
+
+    --color-earth-50: #fdf8f0;
+    --color-earth-100: #faefd8;
+    --color-earth-200: #f4dcb0;
+    --color-earth-300: #ecc47d;
+    --color-earth-400: #e3a449;
+    --color-earth-500: #d98b2a;
+    --color-earth-600: #c97020;
+    --color-earth-700: #a7551c;
+    --color-earth-800: #874420;
+    --color-earth-900: #6e391e;
+    --color-earth-950: #3c1a0b;
+
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-display: 'Playfair Display', Georgia, serif;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply font-sans text-gray-800 antialiased;
+    }
+
+    h1, h2, h3 {
+        @apply font-display;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center gap-2 px-6 py-3 bg-forest-700 text-white font-semibold rounded-lg
+               hover:bg-forest-800 active:bg-forest-900 transition-colors duration-200 shadow-md hover:shadow-lg;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center gap-2 px-6 py-3 bg-white text-forest-700 font-semibold rounded-lg border-2
+               border-forest-700 hover:bg-forest-50 transition-colors duration-200;
+    }
+
+    .btn-earth {
+        @apply inline-flex items-center gap-2 px-6 py-3 bg-earth-600 text-white font-semibold rounded-lg
+               hover:bg-earth-700 transition-colors duration-200 shadow-md;
+    }
+
+    .card {
+        @apply bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300;
+    }
+
+    .section-title {
+        @apply text-3xl md:text-4xl font-display font-bold text-forest-900;
+    }
+
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+    }
+
+    .form-input {
+        @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500
+               focus:border-forest-500 transition-colors bg-white;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+    }
+
+    .nav-link {
+        @apply text-white/80 hover:text-white font-medium transition-colors duration-200 text-sm;
+    }
+
+    .status-pending {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800;
+    }
+    .status-confirmed {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800;
+    }
+    .status-cancelled {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800;
+    }
+    .status-completed {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800;
+    }
+}
