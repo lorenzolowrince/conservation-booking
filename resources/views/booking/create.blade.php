@@ -65,7 +65,7 @@
             {{-- Package selector --}}
             <div x-show="bookingType === 'package'" x-transition class="mt-5">
                 <label class="form-label">Select Package</label>
-                <select name="package_id" x-model="selectedPackageId" class="form-input">
+                <select name="package_id" x-model="selectedPackageId" @change="checkAvailability()" class="form-input">
                     <option value="">— Select a package —</option>
                     @if($selectedArea)
                         @foreach($selectedArea->packages as $pkg)
@@ -81,7 +81,7 @@
             {{-- Accommodation selector --}}
             <div x-show="bookingType === 'accommodation_only'" x-transition class="mt-5">
                 <label class="form-label">Select Accommodation</label>
-                <select name="accommodation_type_id" class="form-input">
+                <select name="accommodation_type_id" x-model="accommodationTypeId" @change="checkAvailability()" class="form-input">
                     <option value="">— Select accommodation —</option>
                     @if($selectedArea)
                         @foreach($selectedArea->accommodationTypes as $acc)
@@ -104,13 +104,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <div>
                     <label class="form-label">Check-in Date <span class="text-red-500">*</span></label>
-                    <input type="date" name="check_in_date" class="form-input"
+                    <input type="date" name="check_in_date" x-model="checkInDate" @change="checkAvailability()" class="form-input"
                            min="{{ date('Y-m-d') }}" value="{{ old('check_in_date') }}" required>
                     @error('check_in_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="form-label">Check-out Date <span class="text-red-500">*</span></label>
-                    <input type="date" name="check_out_date" class="form-input"
+                    <input type="date" name="check_out_date" x-model="checkOutDate" @change="checkAvailability()" class="form-input"
                            min="{{ date('Y-m-d', strtotime('+1 day')) }}" value="{{ old('check_out_date') }}" required>
                     @error('check_out_date')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
@@ -119,15 +119,31 @@
             <div class="grid grid-cols-2 gap-5">
                 <div>
                     <label class="form-label">Adults <span class="text-red-500">*</span></label>
-                    <input type="number" name="num_adults" class="form-input" min="1" max="20"
+                    <input type="number" name="num_adults" x-model="numAdults" @change="checkAvailability()" class="form-input" min="1" max="20"
                            value="{{ old('num_adults', 1) }}" required>
                     @error('num_adults')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="form-label">Children</label>
-                    <input type="number" name="num_children" class="form-input" min="0" max="20"
+                    <input type="number" name="num_children" x-model="numChildren" @change="checkAvailability()" class="form-input" min="0" max="20"
                            value="{{ old('num_children', 0) }}">
                     @error('num_children')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            {{-- Live availability status --}}
+            <div class="mt-4">
+                <div x-show="availabilityStatus === 'checking'" class="flex items-center gap-2 text-sm text-gray-500">
+                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    Checking availability…
+                </div>
+                <div x-show="availabilityStatus === 'available'" class="flex items-center gap-2 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    <span x-text="availabilityMessage || 'Available for your selected dates.'"></span>
+                </div>
+                <div x-show="availabilityStatus === 'unavailable'" class="flex items-center gap-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                    <span x-text="availabilityMessage"></span>
                 </div>
             </div>
         </div>
@@ -208,9 +224,55 @@ function bookingForm() {
         selectedAreaId: '{{ old('conservation_area_id', $selectedArea?->id) }}',
         bookingType: '{{ old('booking_type', 'package') }}',
         selectedPackageId: '{{ old('package_id', $selectedPackage?->id) }}',
+        accommodationTypeId: '{{ old('accommodation_type_id') }}',
+        checkInDate: '{{ old('check_in_date') }}',
+        checkOutDate: '{{ old('check_out_date') }}',
+        numAdults: '{{ old('num_adults', 1) }}',
+        numChildren: '{{ old('num_children', 0) }}',
+        availabilityStatus: 'idle', // idle | checking | available | unavailable
+        availabilityMessage: '',
+        availabilityTimer: null,
         init() {},
         onAreaChange() {
             // In a full implementation, this would fetch packages/accommodations via AJAX
+        },
+        checkAvailability() {
+            clearTimeout(this.availabilityTimer);
+
+            const hasResource = this.bookingType === 'package' ? this.selectedPackageId : this.accommodationTypeId;
+            if (!hasResource || !this.checkInDate || !this.checkOutDate || !this.numAdults) {
+                this.availabilityStatus = 'idle';
+                return;
+            }
+
+            this.availabilityStatus = 'checking';
+
+            this.availabilityTimer = setTimeout(() => {
+                const params = new URLSearchParams({
+                    check_in_date: this.checkInDate,
+                    check_out_date: this.checkOutDate,
+                    num_adults: this.numAdults,
+                    num_children: this.numChildren || 0,
+                });
+                if (this.bookingType === 'package' && this.selectedPackageId) {
+                    params.set('package_id', this.selectedPackageId);
+                }
+                if (this.accommodationTypeId) {
+                    params.set('accommodation_type_id', this.accommodationTypeId);
+                }
+
+                fetch("{{ route('booking.availability') }}?" + params.toString(), {
+                    headers: { 'Accept': 'application/json' },
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.availabilityStatus = data.available ? 'available' : 'unavailable';
+                        this.availabilityMessage = data.message || '';
+                    })
+                    .catch(() => {
+                        this.availabilityStatus = 'idle';
+                    });
+            }, 400);
         }
     }
 }

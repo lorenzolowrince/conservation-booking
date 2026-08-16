@@ -72,6 +72,7 @@ class AccommodationTypeController extends Controller
             'type' => 'required|in:' . implode(',', self::TYPES),
             'description' => 'nullable|string',
             'capacity' => 'required|integer|min:1',
+            'total_units' => 'required|integer|min:1',
             'price_per_night' => 'required|numeric|min:0',
             'price_per_night_foreigner' => 'nullable|numeric|min:0',
             'amenities' => 'nullable|string',

@@ -36,6 +36,7 @@
                         ['route' => 'admin.areas.index', 'label' => 'Conservation Areas', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'],
                         ['route' => 'admin.packages.index', 'label' => 'Packages', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
                         ['route' => 'admin.accommodation-types.index', 'label' => 'Accommodations', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3v-6a1 1 0 011-1h2a1 1 0 011 1v6h3a1 1 0 001-1V10m-9 3h4'],
+                        ['route' => 'admin.blocked-dates.index', 'label' => 'Blocked Dates', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
                     ];
 
                     if (auth()->user()->isAdmin()) {

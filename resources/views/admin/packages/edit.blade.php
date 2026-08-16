@@ -40,7 +40,11 @@
                     <label class="form-label">Max Pax</label>
                     <input type="number" name="max_pax" class="form-input" min="1" value="{{ old('max_pax', $package->max_pax) }}">
                 </div>
-                <div></div>
+                <div>
+                    <label class="form-label">Daily Capacity</label>
+                    <input type="number" name="daily_capacity" class="form-input" min="1" value="{{ old('daily_capacity', $package->daily_capacity) }}" placeholder="Leave blank for unlimited">
+                    <p class="text-xs text-gray-400 mt-1">Total seats/slots available across all bookings per day. Blank = no cap.</p>
+                </div>
                 <div>
                     <label class="form-label">Price/Person (Malaysian)</label>
                     <input type="number" name="price_per_person" class="form-input" step="0.01" min="0" value="{{ old('price_per_person', $package->price_per_person) }}" required>

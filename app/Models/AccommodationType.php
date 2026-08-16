@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AccommodationType extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'conservation_area_id', 'name', 'type', 'description',
-        'capacity', 'price_per_night', 'price_per_night_foreigner',
+        'capacity', 'total_units', 'price_per_night', 'price_per_night_foreigner',
         'amenities', 'image', 'is_active',
     ];
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AccommodationTypeController as AdminAccommodationTypeController;
 use App\Http\Controllers\Admin\AreaController as AdminAreaController;
+use App\Http\Controllers\Admin\AvailabilityBlockController as AdminAvailabilityBlockController;
 use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -28,6 +29,7 @@ Route::prefix('areas')->name('areas.')->group(function () {
 // Booking (public)
 Route::prefix('booking')->name('booking.')->group(function () {
     Route::get('/create', [BookingController::class, 'create'])->name('create');
+    Route::get('/availability', [BookingController::class, 'checkAvailability'])->name('availability');
     Route::post('/store', [BookingController::class, 'store'])->name('store');
     Route::get('/confirmation/{ref}', [BookingController::class, 'confirmation'])->name('confirmation');
     Route::get('/track', [BookingController::class, 'track'])->name('track');
@@ -88,6 +90,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::cla
 
     // Accommodation Types (list viewable by Staff; create/edit/delete requires Admin+)
     Route::resource('accommodation-types', AdminAccommodationTypeController::class)->except(['show'])
+        ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'role:admin');
+
+    // Blocked Dates (list viewable by Staff; create/edit/delete requires Admin+)
+    Route::resource('blocked-dates', AdminAvailabilityBlockController::class)
+        ->except(['show'])
+        ->parameters(['blocked-dates' => 'blockedDate'])
         ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'role:admin');
 
     // Backup (Admin+ only)

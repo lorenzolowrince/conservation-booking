@@ -21,6 +21,7 @@
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Area</th>
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Type</th>
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Capacity</th>
+                    <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Units</th>
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Price/Night (MY)</th>
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Status</th>
                     <th class="text-left px-4 py-3"></th>
@@ -33,6 +34,7 @@
                     <td class="px-4 py-3 text-gray-500 text-xs">{{ $acc->conservationArea->short_name }}</td>
                     <td class="px-4 py-3 text-gray-600 capitalize">{{ $acc->type }}</td>
                     <td class="px-4 py-3 text-gray-500">{{ $acc->capacity }} pax</td>
+                    <td class="px-4 py-3 text-gray-500">{{ $acc->total_units }}</td>
                     <td class="px-4 py-3 font-semibold text-forest-700">RM {{ number_format($acc->price_per_night, 0) }}</td>
                     <td class="px-4 py-3">
                         <span class="badge {{ $acc->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
@@ -51,7 +53,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7" class="px-4 py-10 text-center text-gray-400">No accommodation types found.</td></tr>
+                <tr><td colspan="8" class="px-4 py-10 text-center text-gray-400">No accommodation types found.</td></tr>
                 @endforelse
             </tbody>
         </table>

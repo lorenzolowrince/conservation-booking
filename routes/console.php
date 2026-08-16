@@ -13,3 +13,9 @@ Schedule::command('backup:run --type=scheduled')
     ->dailyAt('00:00')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/backup.log'));
+
+// Release inventory held by pending bookings that exceeded the hold window
+Schedule::command('bookings:expire-stale')
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/bookings-expire.log'));

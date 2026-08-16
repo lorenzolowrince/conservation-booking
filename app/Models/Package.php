@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Package extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'conservation_area_id', 'name', 'slug', 'description',
-        'duration_days', 'min_pax', 'max_pax',
+        'duration_days', 'min_pax', 'max_pax', 'daily_capacity',
         'price_per_person', 'price_per_person_foreigner',
         'inclusions', 'exclusions', 'itinerary', 'image',
         'is_active', 'sort_order',

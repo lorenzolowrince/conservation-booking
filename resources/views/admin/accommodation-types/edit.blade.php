@@ -44,10 +44,14 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="form-label">Capacity (pax) <span class="text-red-500">*</span></label>
+                    <label class="form-label">Capacity (pax per unit) <span class="text-red-500">*</span></label>
                     <input type="number" name="capacity" class="form-input" min="1" value="{{ old('capacity', $accommodationType->capacity) }}" required>
                 </div>
-                <div></div>
+                <div>
+                    <label class="form-label">Total Units <span class="text-red-500">*</span></label>
+                    <input type="number" name="total_units" class="form-input" min="1" value="{{ old('total_units', $accommodationType->total_units) }}" required>
+                    <p class="text-xs text-gray-400 mt-1">How many of this accommodation type physically exist (e.g. 5 chalets).</p>
+                </div>
                 <div>
                     <label class="form-label">Price/Night (Malaysian)</label>
                     <input type="number" name="price_per_night" class="form-input" step="0.01" min="0" value="{{ old('price_per_night', $accommodationType->price_per_night) }}" required>
