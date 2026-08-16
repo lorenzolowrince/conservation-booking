@@ -26,7 +26,7 @@
             </div>
             <div>
                 <label class="form-label">New Password</label>
-                <input type="password" name="password" class="form-input" minlength="8">
+                <input type="password" name="password" class="form-input" minlength="8" autocomplete="new-password">
                 <p class="text-xs text-gray-400 mt-1">Leave blank to keep the current password.</p>
             </div>
             <div>

@@ -104,7 +104,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::cla
         Route::get('/create', [AdminUserController::class, 'create'])->name('create');
         Route::post('/', [AdminUserController::class, 'store'])->name('store');
         Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
-        Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
+        Route::match(['put', 'patch'], '/{user}', [AdminUserController::class, 'update'])->name('update');
         Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
     });
 });

@@ -6,7 +6,7 @@
 @section('content')
 
 <div class="max-w-xl">
-    <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-5">
+    <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-5" autocomplete="off">
         @csrf
 
         @if($errors->any())
@@ -18,15 +18,15 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
             <div>
                 <label class="form-label">Full Name <span class="text-red-500">*</span></label>
-                <input type="text" name="name" class="form-input" value="{{ old('name') }}" required>
+                <input type="text" name="name" class="form-input" value="{{ old('name') }}" autocomplete="off" required>
             </div>
             <div>
                 <label class="form-label">Email <span class="text-red-500">*</span></label>
-                <input type="email" name="email" class="form-input" value="{{ old('email') }}" required>
+                <input type="email" name="email" class="form-input" value="{{ old('email') }}" autocomplete="off" required>
             </div>
             <div>
                 <label class="form-label">Password <span class="text-red-500">*</span></label>
-                <input type="password" name="password" class="form-input" minlength="8" required>
+                <input type="password" name="password" class="form-input" minlength="8" autocomplete="new-password" required>
                 <p class="text-xs text-gray-400 mt-1">At least 8 characters.</p>
             </div>
             <div>
