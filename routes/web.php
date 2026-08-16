@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AccommodationTypeController as AdminAccommodationTypeController;
 use App\Http\Controllers\Admin\AreaController as AdminAreaController;
 use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
@@ -73,6 +74,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::cla
 
     // Packages
     Route::resource('packages', AdminPackageController::class)->except(['show']);
+
+    // Accommodation Types
+    Route::resource('accommodation-types', AdminAccommodationTypeController::class)->except(['show']);
 
     // Backup
     Route::prefix('backup')->name('backup.')->group(function () {

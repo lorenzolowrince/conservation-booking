@@ -61,12 +61,21 @@
 
         {{-- Accommodations --}}
         <div class="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 class="font-display font-bold text-gray-900 mb-4">Accommodations ({{ $area->accommodationTypes->count() }})</h3>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display font-bold text-gray-900">Accommodations ({{ $area->accommodationTypes->count() }})</h3>
+                <a href="{{ route('admin.accommodation-types.create', ['area' => $area->id]) }}" class="btn-primary py-1.5 px-3 text-xs">+ Add Accommodation</a>
+            </div>
             @forelse($area->accommodationTypes as $acc)
             <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
                 <div>
                     <div class="font-medium text-sm text-gray-900">{{ $acc->name }}</div>
                     <div class="text-xs text-gray-400 capitalize">{{ $acc->type }} · {{ $acc->capacity }} pax · RM {{ number_format($acc->price_per_night, 0) }}/night</div>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <span class="badge {{ $acc->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }} text-xs">
+                        {{ $acc->is_active ? 'Active' : 'Off' }}
+                    </span>
+                    <a href="{{ route('admin.accommodation-types.edit', $acc) }}" class="text-forest-600 text-xs hover:underline">Edit</a>
                 </div>
             </div>
             @empty
