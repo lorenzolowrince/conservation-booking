@@ -70,6 +70,7 @@ class AvailabilityService
         $checkIn = $params['check_in_date'];
         $checkOut = $params['check_out_date'];
         $requestedPax = (int) ($params['num_adults'] ?? 0) + (int) ($params['num_children'] ?? 0);
+        $excludeBookingId = $params['exclude_booking_id'] ?? null;
 
         if ($this->isBlocked($packageId, $accommodationTypeId, $checkIn, $checkOut)) {
             return new AvailabilityResult(
@@ -83,11 +84,11 @@ class AvailabilityService
         $accommodationBreakdown = null;
 
         if ($packageId) {
-            $packageBreakdown = $this->packageCapacity($packageId, $checkIn, $checkOut, $requestedPax);
+            $packageBreakdown = $this->packageCapacity($packageId, $checkIn, $checkOut, $requestedPax, $excludeBookingId);
         }
 
         if ($accommodationTypeId) {
-            $accommodationBreakdown = $this->accommodationCapacity($accommodationTypeId, $checkIn, $checkOut, $requestedPax);
+            $accommodationBreakdown = $this->accommodationCapacity($accommodationTypeId, $checkIn, $checkOut, $requestedPax, $excludeBookingId);
         }
 
         $available = ($packageBreakdown === null || $packageBreakdown['available'])
@@ -134,7 +135,7 @@ class AvailabilityService
             ->exists();
     }
 
-    private function packageCapacity(int $packageId, $checkIn, $checkOut, int $requestedPax): array
+    private function packageCapacity(int $packageId, $checkIn, $checkOut, int $requestedPax, ?int $excludeBookingId = null): array
     {
         $package = Package::findOrFail($packageId);
 
@@ -143,7 +144,7 @@ class AvailabilityService
         }
 
         $used = (int) Booking::query()
-            ->activeOverlap($checkIn, $checkOut)
+            ->activeOverlap($checkIn, $checkOut, $excludeBookingId)
             ->where('package_id', $packageId)
             ->selectRaw('COALESCE(SUM(num_adults + num_children), 0) as total')
             ->value('total');
@@ -158,18 +159,18 @@ class AvailabilityService
         ];
     }
 
-    private function accommodationCapacity(int $accommodationTypeId, $checkIn, $checkOut, int $requestedPax): array
+    private function accommodationCapacity(int $accommodationTypeId, $checkIn, $checkOut, int $requestedPax, ?int $excludeBookingId = null): array
     {
         $accommodationType = AccommodationType::findOrFail($accommodationTypeId);
         $perUnitCapacity = max(1, $accommodationType->capacity);
 
-        $unitsRequired = (int) ceil($requestedPax / $perUnitCapacity);
+        $unitsRequired = self::unitsRequiredFor($requestedPax, $perUnitCapacity);
 
         $usedUnits = Booking::query()
-            ->activeOverlap($checkIn, $checkOut)
+            ->activeOverlap($checkIn, $checkOut, $excludeBookingId)
             ->where('accommodation_type_id', $accommodationTypeId)
             ->get(['num_adults', 'num_children'])
-            ->sum(fn (Booking $booking) => (int) ceil(($booking->num_adults + $booking->num_children) / $perUnitCapacity));
+            ->sum(fn (Booking $booking) => self::unitsRequiredFor($booking->num_adults + $booking->num_children, $perUnitCapacity));
 
         $remainingUnits = max(0, $accommodationType->total_units - $usedUnits);
 
@@ -180,5 +181,15 @@ class AvailabilityService
             'remaining_units' => $remainingUnits,
             'available' => ($usedUnits + $unitsRequired) <= $accommodationType->total_units,
         ];
+    }
+
+    /**
+     * How many physical units a party of $pax needs, given each unit holds
+     * $perUnitCapacity people. Shared with the Availability Calendar so the
+     * ceil-division rule lives in exactly one place.
+     */
+    public static function unitsRequiredFor(int $pax, int $perUnitCapacity): int
+    {
+        return (int) ceil($pax / max(1, $perUnitCapacity));
     }
 }

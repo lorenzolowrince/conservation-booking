@@ -24,9 +24,14 @@
         </div>
         <button type="submit" class="btn-primary py-2 px-4 text-sm">Filter</button>
         <a href="{{ route('admin.bookings.index') }}" class="btn-secondary py-2 px-4 text-sm">Clear</a>
-        <a href="{{ route('admin.bookings.import.form') }}" class="btn-secondary py-2 px-4 text-sm ml-auto">
-            Import from Excel
-        </a>
+        <div class="ml-auto flex gap-2">
+            <a href="{{ route('admin.bookings.import.form') }}" class="btn-secondary py-2 px-4 text-sm">
+                Import from Excel
+            </a>
+            <a href="{{ route('admin.bookings.create') }}" class="btn-primary py-2 px-4 text-sm">
+                + New Booking
+            </a>
+        </div>
     </form>
 </div>
 
@@ -43,6 +48,7 @@
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Amount</th>
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Status</th>
                     <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Payment</th>
+                    <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wide">Assigned</th>
                     <th class="text-left px-4 py-3"></th>
                 </tr>
             </thead>
@@ -66,13 +72,14 @@
                             {{ ucfirst($booking->payment_status) }}
                         </span>
                     </td>
+                    <td class="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{{ $booking->assignedTo?->name ?? '—' }}</td>
                     <td class="px-4 py-3">
                         <a href="{{ route('admin.bookings.show', $booking) }}" class="text-forest-600 hover:text-forest-800 font-medium text-xs">View</a>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="px-4 py-12 text-center text-gray-400">No bookings found.</td>
+                    <td colspan="9" class="px-4 py-12 text-center text-gray-400">No bookings found.</td>
                 </tr>
                 @endforelse
             </tbody>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccommodationType;
+use App\Models\ActivityLog;
 use App\Models\AvailabilityBlock;
 use App\Models\Package;
 use Illuminate\Http\Request;
@@ -33,7 +34,14 @@ class AvailabilityBlockController extends Controller
         $validated = $this->validated($request);
         $validated['created_by'] = $request->user()->id;
 
-        AvailabilityBlock::create($validated);
+        $block = AvailabilityBlock::create($validated);
+
+        ActivityLog::record(
+            ActivityLog::ACTION_AVAILABILITY_BLOCKED,
+            $block,
+            'Dates blocked for ' . ($block->package?->name ?? $block->accommodationType?->name) . " ({$block->start_date->format('d M Y')} – {$block->end_date->format('d M Y')}).",
+            reason: $block->reason,
+        );
 
         return redirect()->route('admin.blocked-dates.index')->with('success', 'Dates blocked.');
     }
@@ -57,6 +65,14 @@ class AvailabilityBlockController extends Controller
 
     public function destroy(AvailabilityBlock $blockedDate)
     {
+        $description = 'Block removed for ' . ($blockedDate->package?->name ?? $blockedDate->accommodationType?->name)
+            . " ({$blockedDate->start_date->format('d M Y')} – {$blockedDate->end_date->format('d M Y')}).";
+
+        // Log before deleting: subject_type/subject_id are stored either
+        // way, but this keeps the timeline consistent with how other
+        // actions are logged (subject captured while it still exists).
+        ActivityLog::record(ActivityLog::ACTION_AVAILABILITY_UNBLOCKED, $blockedDate, $description);
+
         $blockedDate->delete();
 
         return redirect()->route('admin.blocked-dates.index')->with('success', 'Block removed — those dates are open again.');

@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\AccommodationTypeController as AdminAccommodationTypeController;
+use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\AreaController as AdminAreaController;
 use App\Http\Controllers\Admin\AvailabilityBlockController as AdminAvailabilityBlockController;
+use App\Http\Controllers\Admin\AvailabilityCalendarController as AdminAvailabilityCalendarController;
 use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PackageController as AdminPackageController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ConservationAreaController;
@@ -57,14 +60,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::cla
     // Bookings
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/', [AdminBookingController::class, 'index'])->name('index');
+        Route::get('/create', [AdminBookingController::class, 'create'])->name('create');
+        Route::post('/', [AdminBookingController::class, 'store'])->name('store');
         Route::get('/import', [AdminBookingController::class, 'importForm'])->name('import.form');
         Route::post('/import', [AdminBookingController::class, 'import'])->name('import');
         Route::get('/import/template', [AdminBookingController::class, 'downloadTemplate'])->name('import.template');
         Route::get('/{booking}', [AdminBookingController::class, 'show'])->name('show');
+        Route::get('/{booking}/reschedule', [AdminBookingController::class, 'editReschedule'])->name('reschedule.edit');
+        Route::patch('/{booking}/reschedule', [AdminBookingController::class, 'reschedule'])->name('reschedule');
         Route::post('/{booking}/note', [AdminBookingController::class, 'addNote'])->name('note');
         Route::patch('/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('status')->middleware('role:admin');
         Route::patch('/{booking}/payment', [AdminBookingController::class, 'updatePayment'])->name('payment')->middleware('role:admin');
+        Route::patch('/{booking}/assign', [AdminBookingController::class, 'assign'])->name('assign')->middleware('role:admin');
     });
+
+    // Availability Calendar (Staff+ -- read-only operational visibility)
+    Route::get('/availability-calendar', [AdminAvailabilityCalendarController::class, 'index'])->name('availability-calendar');
+
+    // Management Reporting (Admin+)
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index')->middleware('role:admin');
+    Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export')->middleware('role:admin');
+
+    // Audit Log (Admin+)
+    Route::get('/activity-log', [AdminActivityLogController::class, 'index'])->name('activity-log.index')->middleware('role:admin');
 
     // Areas
     Route::prefix('areas')->name('areas.')->group(function () {

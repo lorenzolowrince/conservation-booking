@@ -14,7 +14,12 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-5">
                 <h2 class="font-display font-bold text-gray-900">Booking Details</h2>
-                <span class="status-{{ $booking->status }} text-sm px-3 py-1">{{ ucfirst($booking->status) }}</span>
+                <div class="flex items-center gap-2">
+                    <span class="status-{{ $booking->status }} text-sm px-3 py-1">{{ ucfirst($booking->status) }}</span>
+                    @if(auth()->user()->isStaff() && in_array($booking->status, ['pending', 'confirmed']))
+                    <a href="{{ route('admin.bookings.reschedule.edit', $booking) }}" class="btn-secondary py-1.5 px-3 text-xs">Reschedule</a>
+                    @endif
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
@@ -100,6 +105,25 @@
                 <button type="submit" class="btn-primary text-sm py-2 px-4">Save Note</button>
             </form>
         </div>
+
+        {{-- Booking Timeline --}}
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 class="font-display font-bold text-gray-900 mb-4">Booking Timeline</h2>
+            @forelse($timeline as $event)
+            <div class="flex gap-3 py-3 border-b border-gray-50 last:border-0">
+                <div class="w-1.5 h-1.5 rounded-full bg-forest-500 mt-2 shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm text-gray-800">{{ $event->description }}</div>
+                    @if($event->reason)
+                    <div class="text-xs text-gray-400 mt-0.5">Reason: {{ $event->reason }}</div>
+                    @endif
+                    <div class="text-xs text-gray-400 mt-0.5">{{ $event->created_at->format('d M Y H:i') }} &middot; {{ $event->user?->name ?? 'System' }}</div>
+                </div>
+            </div>
+            @empty
+            <p class="text-gray-400 text-sm">No activity recorded yet.</p>
+            @endforelse
+        </div>
     </div>
 
     {{-- Sidebar: Actions & Finance --}}
@@ -140,13 +164,13 @@
         </div>
 
         {{-- Update Status --}}
-        <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="bg-white rounded-xl border border-gray-200 p-5" x-data="{ showCancelReason: false }">
             <h3 class="font-display font-bold text-gray-900 mb-4">Update Status</h3>
             @if(auth()->user()->isAdmin())
             <form action="{{ route('admin.bookings.status', $booking) }}" method="POST" class="space-y-3">
                 @csrf @method('PATCH')
                 <div class="grid grid-cols-2 gap-2">
-                    @foreach(['pending', 'confirmed', 'cancelled', 'completed'] as $s)
+                    @foreach(['pending', 'confirmed', 'completed'] as $s)
                     <button type="submit" name="status" value="{{ $s }}"
                             class="py-2 px-3 rounded-lg text-sm font-medium border transition-colors
                                    {{ $booking->status === $s
@@ -155,6 +179,18 @@
                         {{ ucfirst($s) }}
                     </button>
                     @endforeach
+                    <button type="button" @click="showCancelReason = true"
+                            class="py-2 px-3 rounded-lg text-sm font-medium border transition-colors
+                                   {{ $booking->status === 'cancelled'
+                                      ? 'bg-red-600 text-white border-red-600'
+                                      : 'bg-gray-50 text-red-600 border-gray-200 hover:bg-red-50' }}">
+                        Cancelled
+                    </button>
+                </div>
+                <div x-show="showCancelReason" x-transition class="pt-3 mt-1 border-t border-gray-100">
+                    <label class="form-label text-xs">Cancellation reason <span class="text-red-500">*</span></label>
+                    <input type="text" name="reason" class="form-input text-sm" placeholder="Why is this booking being cancelled?" required>
+                    <button type="submit" name="status" value="cancelled" class="btn-primary text-xs py-2 px-3 mt-2">Confirm Cancellation</button>
                 </div>
             </form>
             @else
@@ -163,6 +199,28 @@
             @endif
             @if($booking->confirmed_at)
             <div class="mt-3 text-xs text-gray-400">Confirmed: {{ $booking->confirmed_at->format('d M Y H:i') }}</div>
+            @endif
+            @if($booking->status === 'cancelled' && $booking->cancellation_reason)
+            <div class="mt-3 text-xs text-gray-400">Cancellation reason: {{ $booking->cancellation_reason }}</div>
+            @endif
+        </div>
+
+        {{-- Assigned Staff --}}
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 class="font-display font-bold text-gray-900 mb-3">Assigned Staff</h3>
+            @if(auth()->user()->isAdmin())
+            <form action="{{ route('admin.bookings.assign', $booking) }}" method="POST" class="flex gap-2">
+                @csrf @method('PATCH')
+                <select name="assigned_to" class="form-input flex-1 py-1.5 text-sm">
+                    <option value="">— Unassigned —</option>
+                    @foreach($staff as $s)
+                    <option value="{{ $s->id }}" {{ $booking->assigned_to === $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="bg-gray-700 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-gray-800 transition-colors">Save</button>
+            </form>
+            @else
+            <span class="text-gray-700 text-sm">{{ $booking->assignedTo?->name ?? 'Unassigned' }}</span>
             @endif
         </div>
 

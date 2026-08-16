@@ -16,13 +16,13 @@ class Booking extends Model
     public const ACTIVE_STATUSES = ['pending', 'confirmed'];
 
     protected $fillable = [
-        'booking_ref', 'user_id', 'conservation_area_id', 'package_id',
+        'booking_ref', 'user_id', 'assigned_to', 'conservation_area_id', 'package_id',
         'accommodation_type_id', 'contact_name', 'contact_email',
         'contact_phone', 'contact_nationality', 'booking_type',
         'check_in_date', 'check_out_date', 'num_adults', 'num_children',
         'subtotal', 'tax', 'total_amount', 'status', 'payment_status',
         'payment_method', 'special_requests', 'admin_notes',
-        'confirmed_at', 'cancelled_at',
+        'confirmed_at', 'cancelled_at', 'cancellation_reason',
     ];
 
     protected $casts = [
@@ -38,6 +38,11 @@ class Booking extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 
     public function conservationArea(): BelongsTo
@@ -64,8 +69,12 @@ class Booking extends Model
      * Bookings whose stay overlaps [$checkIn, $checkOut) and whose status
      * still consumes inventory. Half-open interval: a checkout on the same
      * day as another booking's check-in does NOT count as a conflict.
+     *
+     * $excludeId excludes a specific booking from the count -- needed when
+     * rescheduling or reactivating a booking, so it doesn't count against
+     * its own current reservation.
      */
-    public function scopeActiveOverlap(Builder $query, $checkIn, $checkOut): Builder
+    public function scopeActiveOverlap(Builder $query, $checkIn, $checkOut, ?int $excludeId = null): Builder
     {
         // whereDate() (not where()) because check_in_date/check_out_date are
         // stored as full datetimes ("2026-08-15 00:00:00") even though the
@@ -74,7 +83,8 @@ class Booking extends Model
         // break the back-to-back-dates boundary case.
         return $query->whereIn('status', self::ACTIVE_STATUSES)
             ->whereDate('check_in_date', '<', $checkOut)
-            ->whereDate('check_out_date', '>', $checkIn);
+            ->whereDate('check_out_date', '>', $checkIn)
+            ->when($excludeId, fn (Builder $q) => $q->where('id', '!=', $excludeId));
     }
 
     public function getStatusBadgeColorAttribute(): string

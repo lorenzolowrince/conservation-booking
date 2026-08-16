@@ -6,10 +6,9 @@ use App\Exceptions\AvailabilityException;
 use App\Models\Booking;
 use App\Models\ConservationArea;
 use App\Models\Package;
-use App\Models\AccommodationType;
 use App\Services\AvailabilityService;
+use App\Services\BookingCreationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -51,86 +50,8 @@ class BookingController extends Controller
             'special_requests' => 'nullable|string|max:1000',
         ]);
 
-        $area = ConservationArea::findOrFail($validated['conservation_area_id']);
-
-        $availabilityParams = [
-            'package_id' => $validated['package_id'] ?? null,
-            'accommodation_type_id' => $validated['accommodation_type_id'] ?? null,
-            'check_in_date' => $validated['check_in_date'],
-            'check_out_date' => $validated['check_out_date'],
-            'num_adults' => $validated['num_adults'],
-            'num_children' => $validated['num_children'],
-        ];
-
-        $availabilityService = app(AvailabilityService::class);
-
-        // Fast, unlocked pre-check: fail fast with a friendly message before
-        // doing any pricing work. Not authoritative — see the in-transaction
-        // recheck below, which is what actually prevents double-booking.
-        $precheck = $availabilityService->checkAvailability($availabilityParams);
-        if (! $precheck->available) {
-            return back()->withInput()->withErrors(['availability' => $precheck->message]);
-        }
-
-        // Calculate total
-        $nights = \Carbon\Carbon::parse($validated['check_in_date'])
-            ->diffInDays(\Carbon\Carbon::parse($validated['check_out_date']));
-        $totalPax = $validated['num_adults'] + $validated['num_children'];
-        $subtotal = 0;
-
-        if ($validated['package_id'] ?? null) {
-            $package = Package::findOrFail($validated['package_id']);
-            $isForeigner = strtolower($validated['contact_nationality']) !== 'malaysian';
-            $pricePerPerson = $isForeigner && $package->price_per_person_foreigner
-                ? $package->price_per_person_foreigner
-                : $package->price_per_person;
-            $subtotal = $pricePerPerson * $validated['num_adults'];
-        } elseif ($validated['accommodation_type_id'] ?? null) {
-            $accType = AccommodationType::findOrFail($validated['accommodation_type_id']);
-            $isForeigner = strtolower($validated['contact_nationality']) !== 'malaysian';
-            $pricePerNight = $isForeigner && $accType->price_per_night_foreigner
-                ? $accType->price_per_night_foreigner
-                : $accType->price_per_night;
-            $subtotal = $pricePerNight * max(1, $nights);
-        }
-
-        $tax = $subtotal * 0.06; // 6% SST
-        $total = $subtotal + $tax;
-
         try {
-            $booking = DB::transaction(function () use ($availabilityService, $availabilityParams, $area, $validated, $subtotal, $tax, $total) {
-                // Authoritative recheck: locks the package/accommodation-type
-                // row(s) first, so a concurrent submission for the same
-                // resource is forced to wait and then sees our committed
-                // booking. This is what actually closes the race window.
-                $recheck = $availabilityService->checkAvailabilityForUpdate($availabilityParams);
-                if (! $recheck->available) {
-                    throw new AvailabilityException($recheck->message);
-                }
-
-                return Booking::create([
-                    'booking_ref' => Booking::generateRef($area->code),
-                    'user_id' => auth()->id(),
-                    'conservation_area_id' => $validated['conservation_area_id'],
-                    'package_id' => $validated['package_id'] ?? null,
-                    'accommodation_type_id' => $validated['accommodation_type_id'] ?? null,
-                    'contact_name' => $validated['contact_name'],
-                    'contact_email' => $validated['contact_email'],
-                    'contact_phone' => $validated['contact_phone'],
-                    'contact_nationality' => $validated['contact_nationality'],
-                    'booking_type' => $validated['booking_type'],
-                    'check_in_date' => $validated['check_in_date'],
-                    'check_out_date' => $validated['check_out_date'],
-                    'num_adults' => $validated['num_adults'],
-                    'num_children' => $validated['num_children'],
-                    'subtotal' => $subtotal,
-                    'tax' => $tax,
-                    'total_amount' => $total,
-                    'status' => 'pending',
-                    'payment_status' => 'unpaid',
-                    'special_requests' => $validated['special_requests'] ?? null,
-                ]);
-            });
+            $booking = app(BookingCreationService::class)->create($validated);
         } catch (AvailabilityException $e) {
             return back()->withInput()->withErrors(['availability' => $e->getMessage()]);
         }
