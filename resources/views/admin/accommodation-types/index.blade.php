@@ -7,7 +7,9 @@
 
 <div class="flex justify-between items-center mb-5">
     <p class="text-gray-500 text-sm">{{ $accommodationTypes->total() }} accommodation types across all conservation areas.</p>
+    @if(auth()->user()->isAdmin())
     <a href="{{ route('admin.accommodation-types.create') }}" class="btn-primary text-sm py-2 px-4">+ Add Accommodation</a>
+    @endif
 </div>
 
 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -38,12 +40,14 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 flex gap-2">
+                        @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.accommodation-types.edit', $acc) }}" class="text-forest-600 text-xs hover:underline font-medium">Edit</a>
                         <form action="{{ route('admin.accommodation-types.destroy', $acc) }}" method="POST"
                               onsubmit="return confirm('Delete this accommodation type?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-500 text-xs hover:underline font-medium">Delete</button>
                         </form>
+                        @endif
                     </td>
                 </tr>
                 @empty

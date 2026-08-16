@@ -19,12 +19,14 @@
                     <span class="badge {{ $area->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
                         {{ $area->is_active ? 'Active' : 'Inactive' }}
                     </span>
+                    @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.areas.edit', $area) }}" class="btn-secondary py-1.5 px-3 text-xs">Edit</a>
                     <form action="{{ route('admin.areas.destroy', $area) }}" method="POST"
                           onsubmit="return confirm('Delete {{ addslashes($area->short_name) }}? This cannot be undone.')">
                         @csrf @method('DELETE')
                         <button type="submit" class="py-1.5 px-3 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors border border-red-200">Delete</button>
                     </form>
+                    @endif
                 </div>
             </div>
             <p class="text-gray-600 text-sm">{{ $area->description }}</p>
@@ -39,7 +41,9 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-display font-bold text-gray-900">Packages ({{ $area->packages->count() }})</h3>
+                @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.packages.create') }}" class="btn-primary py-1.5 px-3 text-xs">+ Add Package</a>
+                @endif
             </div>
             @forelse($area->packages as $pkg)
             <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
@@ -51,7 +55,9 @@
                     <span class="badge {{ $pkg->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }} text-xs">
                         {{ $pkg->is_active ? 'Active' : 'Off' }}
                     </span>
+                    @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.packages.edit', $pkg) }}" class="text-forest-600 text-xs hover:underline">Edit</a>
+                    @endif
                 </div>
             </div>
             @empty
@@ -63,7 +69,9 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-display font-bold text-gray-900">Accommodations ({{ $area->accommodationTypes->count() }})</h3>
+                @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.accommodation-types.create', ['area' => $area->id]) }}" class="btn-primary py-1.5 px-3 text-xs">+ Add Accommodation</a>
+                @endif
             </div>
             @forelse($area->accommodationTypes as $acc)
             <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
@@ -75,7 +83,9 @@
                     <span class="badge {{ $acc->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }} text-xs">
                         {{ $acc->is_active ? 'Active' : 'Off' }}
                     </span>
+                    @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.accommodation-types.edit', $acc) }}" class="text-forest-600 text-xs hover:underline">Edit</a>
+                    @endif
                 </div>
             </div>
             @empty

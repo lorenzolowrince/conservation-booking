@@ -7,7 +7,9 @@
 
 <div class="flex justify-between items-center mb-5">
     <p class="text-gray-500 text-sm">{{ $packages->total() }} packages across all conservation areas.</p>
+    @if(auth()->user()->isAdmin())
     <a href="{{ route('admin.packages.create') }}" class="btn-primary text-sm py-2 px-4">+ Add Package</a>
+    @endif
 </div>
 
 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -38,12 +40,14 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 flex gap-2">
+                        @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.packages.edit', $pkg) }}" class="text-forest-600 text-xs hover:underline font-medium">Edit</a>
                         <form action="{{ route('admin.packages.destroy', $pkg) }}" method="POST"
                               onsubmit="return confirm('Delete this package?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-red-500 text-xs hover:underline font-medium">Delete</button>
                         </form>
+                        @endif
                     </td>
                 </tr>
                 @empty

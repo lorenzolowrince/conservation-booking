@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PackageController as AdminPackageController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ConservationAreaController;
 use App\Http\Controllers\HomeController;
@@ -49,6 +50,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::class])->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/access-matrix', [AdminUserController::class, 'matrix'])->name('access-matrix');
+
     // Bookings
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/', [AdminBookingController::class, 'index'])->name('index');
@@ -56,34 +59,53 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', AdminMiddleware::cla
         Route::post('/import', [AdminBookingController::class, 'import'])->name('import');
         Route::get('/import/template', [AdminBookingController::class, 'downloadTemplate'])->name('import.template');
         Route::get('/{booking}', [AdminBookingController::class, 'show'])->name('show');
-        Route::patch('/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('status');
-        Route::patch('/{booking}/payment', [AdminBookingController::class, 'updatePayment'])->name('payment');
         Route::post('/{booking}/note', [AdminBookingController::class, 'addNote'])->name('note');
+        Route::patch('/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('status')->middleware('role:admin');
+        Route::patch('/{booking}/payment', [AdminBookingController::class, 'updatePayment'])->name('payment')->middleware('role:admin');
     });
 
     // Areas
     Route::prefix('areas')->name('areas.')->group(function () {
         Route::get('/', [AdminAreaController::class, 'index'])->name('index');
-        Route::get('/create', [AdminAreaController::class, 'create'])->name('create');
-        Route::post('/', [AdminAreaController::class, 'store'])->name('store');
+
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/create', [AdminAreaController::class, 'create'])->name('create');
+            Route::post('/', [AdminAreaController::class, 'store'])->name('store');
+        });
+
         Route::get('/{area}', [AdminAreaController::class, 'show'])->name('show');
-        Route::get('/{area}/edit', [AdminAreaController::class, 'edit'])->name('edit');
-        Route::patch('/{area}', [AdminAreaController::class, 'update'])->name('update');
-        Route::delete('/{area}', [AdminAreaController::class, 'destroy'])->name('destroy');
+
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/{area}/edit', [AdminAreaController::class, 'edit'])->name('edit');
+            Route::patch('/{area}', [AdminAreaController::class, 'update'])->name('update');
+            Route::delete('/{area}', [AdminAreaController::class, 'destroy'])->name('destroy');
+        });
     });
 
-    // Packages
-    Route::resource('packages', AdminPackageController::class)->except(['show']);
+    // Packages (list viewable by Staff; create/edit/delete requires Admin+)
+    Route::resource('packages', AdminPackageController::class)->except(['show'])
+        ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'role:admin');
 
-    // Accommodation Types
-    Route::resource('accommodation-types', AdminAccommodationTypeController::class)->except(['show']);
+    // Accommodation Types (list viewable by Staff; create/edit/delete requires Admin+)
+    Route::resource('accommodation-types', AdminAccommodationTypeController::class)->except(['show'])
+        ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'role:admin');
 
-    // Backup
-    Route::prefix('backup')->name('backup.')->group(function () {
+    // Backup (Admin+ only)
+    Route::prefix('backup')->name('backup.')->middleware('role:admin')->group(function () {
         Route::get('/', [AdminBackupController::class, 'index'])->name('index');
         Route::post('/', [AdminBackupController::class, 'create'])->name('create');
         Route::get('/{backup}/download', [AdminBackupController::class, 'download'])->name('download');
         Route::delete('/{backup}', [AdminBackupController::class, 'destroy'])->name('destroy');
+    });
+
+    // Users (Super Admin only)
+    Route::prefix('users')->name('users.')->middleware('role:super_admin')->group(function () {
+        Route::get('/', [AdminUserController::class, 'index'])->name('index');
+        Route::get('/create', [AdminUserController::class, 'create'])->name('create');
+        Route::post('/', [AdminUserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
+        Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
     });
 });
 

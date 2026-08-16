@@ -121,6 +121,7 @@
             </div>
             <div class="mt-4 pt-4 border-t border-gray-100">
                 <div class="text-xs text-gray-400 mb-2">Payment Status</div>
+                @if(auth()->user()->isAdmin())
                 <form action="{{ route('admin.bookings.payment', $booking) }}" method="POST" class="flex gap-2">
                     @csrf @method('PATCH')
                     <select name="payment_status" class="form-input flex-1 py-1.5 text-sm">
@@ -130,12 +131,18 @@
                     </select>
                     <button type="submit" class="bg-gray-700 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-gray-800 transition-colors">Save</button>
                 </form>
+                @else
+                <span class="badge {{ $booking->payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
+                    {{ ucfirst($booking->payment_status) }}
+                </span>
+                @endif
             </div>
         </div>
 
         {{-- Update Status --}}
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <h3 class="font-display font-bold text-gray-900 mb-4">Update Status</h3>
+            @if(auth()->user()->isAdmin())
             <form action="{{ route('admin.bookings.status', $booking) }}" method="POST" class="space-y-3">
                 @csrf @method('PATCH')
                 <div class="grid grid-cols-2 gap-2">
@@ -150,6 +157,10 @@
                     @endforeach
                 </div>
             </form>
+            @else
+            <span class="status-{{ $booking->status }}">{{ ucfirst($booking->status) }}</span>
+            <p class="text-xs text-gray-400 mt-2">Only Admin and above can change booking status.</p>
+            @endif
             @if($booking->confirmed_at)
             <div class="mt-3 text-xs text-gray-400">Confirmed: {{ $booking->confirmed_at->format('d M Y H:i') }}</div>
             @endif

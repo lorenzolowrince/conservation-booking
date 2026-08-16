@@ -36,8 +36,19 @@
                         ['route' => 'admin.areas.index', 'label' => 'Conservation Areas', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'],
                         ['route' => 'admin.packages.index', 'label' => 'Packages', 'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
                         ['route' => 'admin.accommodation-types.index', 'label' => 'Accommodations', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3v-6a1 1 0 011-1h2a1 1 0 011 1v6h3a1 1 0 001-1V10m-9 3h4'],
-                        ['route' => 'admin.backup.index', 'label' => 'Backup', 'icon' => 'M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4'],
                     ];
+
+                    if (auth()->user()->isAdmin()) {
+                        $navItems[] = ['route' => 'admin.backup.index', 'label' => 'Backup', 'icon' => 'M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4'];
+                    }
+
+                    if (auth()->user()->isSuperAdmin()) {
+                        $navItems[] = ['route' => 'admin.users.index', 'label' => 'Users', 'icon' => 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-8.13a4 4 0 110 8 4 4 0 010-8zm6 8a4 4 0 10-8 0'];
+                    }
+
+                    if (auth()->user()->isAdmin()) {
+                        $navItems[] = ['route' => 'admin.access-matrix', 'label' => 'Access Matrix', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'];
+                    }
                 @endphp
 
                 @foreach($navItems as $item)

@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
             'name' => 'System Administrator',
             'email' => 'admin@yayasansabah.org',
             'password' => Hash::make('Admin@1234'),
-            'role' => 'admin',
+            'role' => 'super_admin',
             'email_verified_at' => now(),
         ]);
 
